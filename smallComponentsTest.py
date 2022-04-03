@@ -1,7 +1,9 @@
 import os
+from time import sleep
 import pandas as pd
 import pathlib
 import re
+from os import devnull
 
 # global variables
 
@@ -35,40 +37,45 @@ def main():
         "Would you like the new name to contain a string before the date?(y/n) ").lower()
 
     while counter <= file_count:
-        if user_choice.isalpha():
-            if user_choice == 'y':
-                head_string = input("Please enter the string: ")
+        if user_choice.isnumeric():
+            print("Please enter a valid option!\nAvailable options are 'y' or 'n'.\nThe program will rerun to validate your data.")
+            return main()
+        else:
+            if user_choice.isalpha():
+                if user_choice == 'y':
+                    head_string = input("Please enter the string: ")
 
-                # renaming operation
-                for x in os.listdir(SPEC_PATH):
-                    full_path = os.path.join(SPEC_PATH, x)
-                    extension = pathlib.Path(full_path).suffix
-                    custom_name = extract_date(full_path)
-                    new_name = f"{head_string}{custom_name}{extension}"
-                    try:
-                        os.rename(os.path.join(SPEC_PATH, x),
-                                  os.path.join(SPEC_PATH, new_name))
-                        print("Success!")
-                        counter += 1
-                    except OSError as e:
-                        print(e)
-                        counter += 1
-
-    # need to work on the else condition and breaking loop
-            else:
-                if user_choice == 'n':
+                    # renaming operation
                     for x in os.listdir(SPEC_PATH):
                         full_path = os.path.join(SPEC_PATH, x)
                         extension = pathlib.Path(full_path).suffix
                         custom_name = extract_date(full_path)
-                        new_name = f"{custom_name}{extension}"
+                        new_name = f"{head_string}{custom_name}{extension}"
                         try:
                             os.rename(os.path.join(SPEC_PATH, x),
                                       os.path.join(SPEC_PATH, new_name))
                             print("Success!")
+                            counter += 1
                         except OSError as e:
                             print(e)
-                        break
+                            counter += 1
+                else:
+                    if user_choice == 'n':
+                        for x in os.listdir(SPEC_PATH):
+                            full_path = os.path.join(SPEC_PATH, x)
+                            extension = pathlib.Path(full_path).suffix
+                            custom_name = extract_date(full_path)
+                            head_string = ''
+                            new_name = f"{head_string}{custom_name}{extension}"
+                            try:
+                                os.rename(os.path.join(SPEC_PATH, x),
+                                          os.path.join(SPEC_PATH, new_name))
+                                print("Success!")
+                                counter += 1
+                            except OSError as e:
+                                print(e)
+                                counter += 1
+
         if counter == file_count:
             break
 
