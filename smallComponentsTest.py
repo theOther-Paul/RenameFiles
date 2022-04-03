@@ -4,7 +4,6 @@ import pathlib
 import re
 
 # global variables
-SPEC_PATH = input("path: ")
 
 
 def format_date(extracted_string):
@@ -26,53 +25,53 @@ def extract_date(path):  # needs to get the full path of the file from the folde
         print(e)
 
 
-# main function
-SPEC_PATH = pathlib.Path(SPEC_PATH).resolve()  # will access the given path
-#SPEC_PATH = SPEC_PATH.replace("\\", r'/')
+def main():
+    SPEC_PATH = input("path: ")
+    SPEC_PATH = pathlib.Path(SPEC_PATH).resolve()  # will access the given path
+    #SPEC_PATH = SPEC_PATH.replace("\\", r'/')
+    file_count = sum(len(files) for _, _, files in os.walk(SPEC_PATH))
+    counter = 0
+    user_choice = input(
+        "Would you like the new name to contain a string before the date?(y/n) ").lower()
 
-user_choice = input(
-    "Would you like the new name to contain a string before the date?(y/n) ").lower()
+    while counter <= file_count:
+        if user_choice.isalpha():
+            if user_choice == 'y':
+                head_string = input("Please enter the string: ")
 
-while True:
-    if user_choice.isalpha():
-        if user_choice == 'y':
-            head_string = input("Please enter the string: ")
+                # renaming operation
+                for x in os.listdir(SPEC_PATH):
+                    full_path = os.path.join(SPEC_PATH, x)
+                    extension = pathlib.Path(full_path).suffix
+                    custom_name = extract_date(full_path)
+                    new_name = f"{head_string}{custom_name}{extension}"
+                    try:
+                        os.rename(os.path.join(SPEC_PATH, x),
+                                  os.path.join(SPEC_PATH, new_name))
+                        print("Success!")
+                        counter += 1
+                    except OSError as e:
+                        print(e)
+                        counter += 1
 
-            # renaming operation
-            for x in os.listdir(SPEC_PATH):
-                full_path = os.path.join(SPEC_PATH, x)
-                extension = pathlib.Path(full_path).suffix
-                custom_name = extract_date(full_path)
-                new_name = f"{head_string}{custom_name}{extension}"
-                try:
-                    os.rename(os.path.join(SPEC_PATH, x),
-                              os.path.join(SPEC_PATH, new_name))
-                    print("Success!")
-                except OSError as e:
-                    print(e)
+    # need to work on the else condition and breaking loop
+            else:
+                if user_choice == 'n':
+                    for x in os.listdir(SPEC_PATH):
+                        full_path = os.path.join(SPEC_PATH, x)
+                        extension = pathlib.Path(full_path).suffix
+                        custom_name = extract_date(full_path)
+                        new_name = f"{custom_name}{extension}"
+                        try:
+                            os.rename(os.path.join(SPEC_PATH, x),
+                                      os.path.join(SPEC_PATH, new_name))
+                            print("Success!")
+                        except OSError as e:
+                            print(e)
+                        break
+        if counter == file_count:
+            break
 
-# need to work on the else condition and breaking loop
-        # else:
-        #     if user_choice == 'n':
-        #         # will count all the files that contain a specified extension
-        #         for files in os.listdir(SPEC_PATH):
-        #             # might include all xl extensions just to be safe
-        #             if files.endswith(".xls") or files.endswith(".xlsx"):
-        #                 extract_date(files)
-        #                 format_date(files)
-        #                 if files.isfile():
-        #                     custom_name = extract_date(files)
-        #                     new_name = f"{files.suffix}"
-        #                     if SPEC_PATH.isfile():
-        #                         continue
-        #                     else:
-        #                         try:
-        #                             x.rename(SPEC_PATH/new_name)
-        #                             print("Success!")
-        #                         except OSError as e:
-        #                             print(e)
-    # else:
-    #     if user_choice.isnumeric() or user_choice != 'y' or user_choice != 'n':
-    #         print("Please enter a valid choice!")
-    #         break
-    break
+
+if __name__ == '__main__':
+    main()
